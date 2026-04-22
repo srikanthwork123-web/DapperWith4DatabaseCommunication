@@ -1,4 +1,5 @@
 ﻿using DapperWith4DatabaseCommunication.Interfaces;
+using DapperWith4DatabaseCommunication.Utils;
 using Microsoft.Data.SqlClient;
 
 namespace DapperWith4DatabaseCommunication.Data
@@ -17,29 +18,29 @@ WE CAN INJECT IT IN THE CONSTRUCTOR OF THE CONNECTION FACTORY CLASS AND THEN REA
             _configuration = configuration;
         }
         public SqlConnection HotelmanagementsqlConnectionString()
-        {
-            var connectionString = Convert.ToString(_configuration.GetSection("ConnectionStrings:HotelmanagementsqlConnectionString").Value);
+        { //READ THE CONNECTION STRING FROM APPSETTINGS.JSON FILE USING THE IConfiguration INTERFACE AND THEN CREATE A NEW SQL CONNECTION USING THE CONNECTION STRING AND RETURN IT.
+            var connectionString = Convert.ToString(_configuration.GetSection(Connectionstringnames.Hotelmanagement_DBConnectionstringname).Value);
             SqlConnection con = new SqlConnection(connectionString);
             return con;
         }
 
         public SqlConnection MidLandSqlConnectionString()
         {
-            var connectionString = Convert.ToString(_configuration.GetSection("ConnectionStrings:MidLandSqlConnectionString").Value);
+            var connectionString = Convert.ToString(_configuration.GetSection(Connectionstringnames.Midland_DBConnectionstringname).Value);
             SqlConnection con = new SqlConnection(connectionString);
             return con;
         }
 
         public SqlConnection Northwind_DBSqlConnectionString()
         {
-            var connectionString = Convert.ToString(_configuration.GetSection("ConnectionStrings:Northwind_DBSqlConnectionString").Value);
+            var connectionString = Convert.ToString(_configuration.GetSection(Connectionstringnames.Northwind_DBConnectionstringname).Value);
             SqlConnection con = new SqlConnection(connectionString);
             return con;
         }
 
         public SqlConnection RestaurantDBSqlConnectionString()
         {
-            var connectionString = Convert.ToString(_configuration.GetSection("ConnectionStrings:RestaurantDBSqlConnectionString").Value);
+            var connectionString = Convert.ToString(_configuration.GetSection(Connectionstringnames.Restaurant_DBConnectionstringname).Value);
             SqlConnection con = new SqlConnection(connectionString);
             return con;
         }
