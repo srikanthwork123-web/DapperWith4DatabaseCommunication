@@ -6,6 +6,7 @@
         public static string DeptId = "@deptid";
         public static string DeptName = "@deptname";
         public static string DeptLocation = "@deptlocation";
+        public static string DeptInsertedvariable = "@insertedvalue";
         #endregion
 
         #region Order Parameters

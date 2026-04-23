@@ -7,7 +7,7 @@
         // It allows you to collapse and expand sections of code in an IDE, making it easier to focus on specific parts of the codebase.
         // In this case, we are using #region to group the stored procedure names for each entity (Department, Order, Employee, Restaurant) together for better organization and readability.
         #region Department stored procedures
-        public static string AddDepartment = "Usp_AddDepartmentWithoutReturn";
+        public static string AddDepartment = "Usp_AddDepartment";
         public static string UpdateDepartment = "Usp_UpdateDepartment";
         public static string DeleteDepartment = "Usp_DeleteDepartment";
         public static string GetDepartment = "Usp_GetDepartment";
