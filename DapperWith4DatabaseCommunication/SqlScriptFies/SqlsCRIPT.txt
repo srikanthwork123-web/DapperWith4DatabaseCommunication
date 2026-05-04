@@ -1,0 +1,13 @@
+﻿---PLEASE RUN THIS SCRIPT IN HOTEL MANAGEMENT DATABASE--------------
+create table ProjectLevelLog(Id int identity(1,1) primary key,username varchar(100),LogLevel varchar(max),MessageTemplate varchar(max),LogDate datetime)
+Go
+
+Create procedure Usp_ProjectLevelLog(@username varchar(max),@LogLevel varchar(max),@MessageTemplate varchar(max))
+as 
+begin 
+set nocount on
+insert into ProjectLevelLog(username,LogLevel,MessageTemplate,LogDate) values(@username,@LogLevel,@MessageTemplate,GETDATE())
+end
+Go
+Select * from ProjectLevelLog
+GO
