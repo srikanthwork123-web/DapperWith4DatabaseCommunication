@@ -29,5 +29,12 @@
         public static string RestaurantLocation = "@RestaurantLocation";
         public static string CreationDate = "@CreationDate";
         #endregion
+
+        #region Logging Parameters
+
+        public static string Logging_UserName = "@username";
+        public static string Logging_LogLevel = "@LogLevel";
+        public static string Logging_MessageTemplate = "@MessageTemplate";
+        #endregion
     }
 }

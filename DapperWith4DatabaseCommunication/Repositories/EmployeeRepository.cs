@@ -1,20 +1,25 @@
 ﻿using Dapper;//Import the dapper namespace to use the dapper extension methods for executing SQL queries and commands.
+using DapperWith4DatabaseCommunication.Data;
 using DapperWith4DatabaseCommunication.Interfaces;
 using DapperWith4DatabaseCommunication.Models;
 using DapperWith4DatabaseCommunication.Utils;
+using Serilog;
 using System.Data;
 namespace DapperWith4DatabaseCommunication.Repositories
 {
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly IConnectionFactory _connectionFactory;
-
-        public EmployeeRepository(IConnectionFactory connectionFactory)
+        private readonly ILoggingFactory _loggingFactory;
+        public EmployeeRepository(IConnectionFactory connectionFactory, ILoggingFactory loggingFactory)
         {
             _connectionFactory = connectionFactory;
+            _loggingFactory = loggingFactory;
         }
         public async Task<int> AddEmployes(Employee empdetail)
         {
+            Log.Information("EmployeeRepository: AddEmployes method Excution Starts");
+            await _loggingFactory.AddLoggingMessages("chandu", "Information", "EmployeeRepository: AddEmployes method Excution Starts");//logg the message in database using custom logging factory
             //we need to store the Sqlconnection object into IDbConnection Refrence Variable to use the dapper extension methods for executing SQL queries and commands.
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
@@ -28,6 +33,11 @@ namespace DapperWith4DatabaseCommunication.Repositories
                 parameters.Add(StoredprocedureParameters.Insertedvariable, DbType.Int32, direction: ParameterDirection.Output);
                 await con.ExecuteScalarAsync<int>(Storedprocedurenames.AddEmployee, parameters, commandType: CommandType.StoredProcedure);
                 int inserterdid = parameters.Get<int>(StoredprocedureParameters.Insertedvariable);
+                Log.Information("EmployeeRepository: AddEmployes method Excution Ended");
+                await _loggingFactory.AddLoggingMessages("chandu", "Information", "EmployeeRepository: AddEmployes method Excution Ended");//logg the message in database using custom logging factory
+
+                Log.Information("EmployeeRepository: AddEmployes method Excution Ended and Insertedrecord is{@Insertedrecord}", inserterdid);
+                await _loggingFactory.AddLoggingMessages("chandu", "Information", $"EmployeeRepository: AddEmployes method Excution Ended and Insertedrecord is {inserterdid}");//logg the message in database using custom logging factory
                 return inserterdid;
             }
         }

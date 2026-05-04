@@ -1,25 +1,33 @@
-﻿using DapperWith4DatabaseCommunication.Dtos;
+﻿using DapperWith4DatabaseCommunication.Data;
+using DapperWith4DatabaseCommunication.Dtos;
 using DapperWith4DatabaseCommunication.Interfaces;
 using DapperWith4DatabaseCommunication.Models;
+using Serilog;
 
 namespace DapperWith4DatabaseCommunication.Services
 {
     public class EmployeeServices: IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly ILoggingFactory _loggingFactory;
 
-        public EmployeeServices(IEmployeeRepository employeeRepository)
+        public EmployeeServices(IEmployeeRepository employeeRepository, ILoggingFactory loggingFactory)
         {
             _employeeRepository = employeeRepository;
+            _loggingFactory = loggingFactory;
         }
 
         public async Task<int> AddEmployes(EmployeeDto empdetail)
         {
+            Log.Information("EmployeeServices: AddEmployes method Excution Starts");
+            await _loggingFactory.AddLoggingMessages("chandu", "Information", "EmployeeServices: AddEmployes method Excution Starts");//logg the message in database using custom logging factory
             Employee emp = new Employee();
             emp.empid = empdetail.empid;
             emp.empsalary = empdetail.empsalary;
             emp.empname = empdetail.empname;
             var res = await _employeeRepository.AddEmployes(emp);
+            Log.Information("EmployeeServices: AddEmployes method Excution Ended");
+            await _loggingFactory.AddLoggingMessages("chandu", "Information", "EmployeeServices: AddEmployes method Excution Ended");//logg the message in database using custom logging factory
             return res;
         }
 

@@ -6,6 +6,7 @@
         // #region is used to group related code together and make it easier to navigate and understand the structure of the code.
         // It allows you to collapse and expand sections of code in an IDE, making it easier to focus on specific parts of the codebase.
         // In this case, we are using #region to group the stored procedure names for each entity (Department, Order, Employee, Restaurant) together for better organization and readability.
+        
         #region Department stored procedures
         public static string AddDepartment = "Usp_AddDepartment";
         public static string UpdateDepartment = "Usp_UpdateDepartment";
@@ -36,6 +37,10 @@
         public static string DeleteRestaurant = "Usp_DeleteRestaurant";
         public static string GetRestaurant = "Usp_GetRestaurant";
         public static string GetRestaurantById = "Usp_GetRestaurantById";
+        #endregion
+
+        #region Logging storedprocedures
+        public static string AddLoggingMessages = "Usp_ProjectLevelLog";
         #endregion
     }
 }

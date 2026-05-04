@@ -1,8 +1,9 @@
-﻿using DapperWith4DatabaseCommunication.Dtos;
+﻿using DapperWith4DatabaseCommunication.Data;
+using DapperWith4DatabaseCommunication.Dtos;
 using DapperWith4DatabaseCommunication.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using Serilog;
 namespace DapperWith4DatabaseCommunication.Controllers
 {
     [Route("api/[controller]")]
@@ -10,16 +11,26 @@ namespace DapperWith4DatabaseCommunication.Controllers
     public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
-        public EmployeeController(IEmployeeService employeeService)
+
+        private readonly ILoggingFactory _loggingFactory;
+        public EmployeeController(IEmployeeService employeeService, ILoggingFactory loggingFactory)
         {
             _employeeService = employeeService;
+            _loggingFactory = loggingFactory;
         }
         [HttpPost]
         [Route("AddEmployee")]
         public async Task<IActionResult> Post([FromBody] EmployeeDto empdto)
         {//dtos are used to transafer the data purpose used.
+            Log.Information("EmployeeController: Post Api method Excution Starts");
+            Log.Information("EmployeeController: Post Api method called with EmployeeName: {@EmployeeName}", empdto.empname);
+            Log.Information("EmployeeController: Post Api method called with EmployeeSalary: {@EmployeeSalary}", empdto.empsalary);
+            await _loggingFactory.AddLoggingMessages("chandu", "Information", "EmployeeController: Post Api method Excution Starts");//logg the message in database using custom logging factory
+            await _loggingFactory.AddLoggingMessages("chandu", "Information", $"Post Api method called with EmployeeName:{empdto.empname}");//logg the message in database using custom logging factory
+            await _loggingFactory.AddLoggingMessages("chandu", "Information", $"Post Api method called with EmployeeSalary:{empdto.empsalary}");//logg the message in database using custom logging factory
             try
             {
+               // throw new Exception("Custom Exception: EmployeeController: Post Api method Excution Failed");
                 if (!ModelState.IsValid)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, ModelState);
@@ -27,11 +38,15 @@ namespace DapperWith4DatabaseCommunication.Controllers
                 else
                 {
                     var empdata = await _employeeService.AddEmployes(empdto);
+                    Log.Information("EmployeeController: Post Api method Excution Ended");//logg the message in text file using serilog
+                    await _loggingFactory.AddLoggingMessages("chandu", "Information", "Post Api method Excution Ended");//logg the message in database using custom logging factory
                     return StatusCode(StatusCodes.Status201Created, empdata);
                 }
             }
             catch (Exception ex)
             {//if you got any error we are using this statuscode:Status500InternalServerError
+                Log.Error("Custom Failure: {@RequestName}, {@Error}, {@DateTimeUtc}",
+                   "EmployeeController: Post Api method", ex.Message, DateTime.Today);
                 return StatusCode(StatusCodes.Status500InternalServerError, "server not found");
             }
         }
