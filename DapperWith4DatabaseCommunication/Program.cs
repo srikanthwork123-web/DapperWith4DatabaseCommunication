@@ -12,9 +12,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//========================================================================
+//We need to register Serilog to our dependency Injection Conatiner. The UseSerilog method is used to configure Serilog as the logging provider for the application. The configuration.ReadFrom.Configuration(context.Configuration) part tells Serilog to read its configuration settings from the application's configuration, which can be defined in appsettings.json or other configuration sources.
 builder.Host.UseSerilog((context, configuration) =>
 configuration.ReadFrom.Configuration(context.Configuration));
-
+//==========================================================================
 builder.Services.AddSingleton<IConnectionFactory, ConnectionFactory>();//register the connection factory interface and its implementation in the dependency injection container of the application using the AddSingleton method   builder object. The AddSingleton method is used to register a service with a singleton lifetime, which means that a single instance of the service will be created and shared throughout the application's lifetime.
 builder.Services.AddSingleton<ILoggingFactory, LoggingFactory>();//register the logging factory interface and its implementation in the dependency injection container of the application using the AddSingleton method   builder object. The AddSingleton method is used to register a service with a singleton lifetime, which means that a single instance of the service will be created and shared throughout the application's lifetime.
 

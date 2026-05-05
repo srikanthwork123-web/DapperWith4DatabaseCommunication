@@ -17,6 +17,7 @@ namespace DapperWith4DatabaseCommunication.Data
         {
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
+                //DynamicParameters used in dapper,to pass the values to storedprocedure parameters.
                 DynamicParameters p = new DynamicParameters();
                 p.Add(StoredprocedureParameters.Logging_UserName, userName);
                 p.Add(StoredprocedureParameters.Logging_LogLevel, logLevel);
