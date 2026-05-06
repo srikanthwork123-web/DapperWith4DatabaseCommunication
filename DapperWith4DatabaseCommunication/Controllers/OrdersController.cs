@@ -66,9 +66,8 @@ namespace DapperWith4DatabaseCommunication.Controllers
         [Route("GetOrders")]
         public async Task<IActionResult> GetOrder()
         {
-            try
-            {
-                var orderdata = await _ordersService.GetOrders();
+            throw new Exception("Custom Exception: OrdersController: GetOrders Api method Excution Failed");
+            var orderdata = await _ordersService.GetOrders();
                 if (orderdata == null)//here null means if you are not getting any data from db then we will return this statuscode:Status404NotFound
                 {
                     return StatusCode(StatusCodes.Status404NotFound, "orderData not found");
@@ -77,12 +76,7 @@ namespace DapperWith4DatabaseCommunication.Controllers
                 {
                     return StatusCode(StatusCodes.Status200OK, orderdata);
                 }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "server not found");
-            }
-
+            
         }
         [HttpGet]
         [Route("GetOrderByOrderid/{orderid}")]
