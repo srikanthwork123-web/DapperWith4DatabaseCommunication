@@ -1,4 +1,6 @@
-﻿namespace DapperWith4DatabaseCommunication.Utils
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace DapperWith4DatabaseCommunication.Utils
 {
     public static class StoredprocedureParameters
     {
@@ -36,5 +38,15 @@
         public static string Logging_LogLevel = "@LogLevel";
         public static string Logging_MessageTemplate = "@MessageTemplate";
         #endregion
+
+        #region ErrorLog Parameters
+        public static string ErrorLog_StatusCode = "@StatusCode";
+        public static string ErrorLog_ErrorMessage = "@ErrorMessage";
+        public static string ErrorLog_StackTraceError = "@StackTraceError";
+        public static string ErrorLog_InnerExceptionError = "@InnerExceptionError";
+        #endregion
     }
 }
+
+
+

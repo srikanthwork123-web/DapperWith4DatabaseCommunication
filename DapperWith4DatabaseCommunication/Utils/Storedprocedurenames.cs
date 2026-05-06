@@ -42,5 +42,9 @@
         #region Logging storedprocedures
         public static string AddLoggingMessages = "Usp_ProjectLevelLog";
         #endregion
+
+        #region ErrorLog storedprocedures
+        public static string AddProjectLevelErrorlog = "Usp_AddProjectLevelErrorlog";
+        #endregion
     }
 }
