@@ -19,8 +19,7 @@ namespace DapperWith4DatabaseCommunication.Controllers
         [Route("AddOrder")]
         public async Task<IActionResult> Post([FromBody] OrdersDto orderdto)
         {
-            try
-            {
+            
                 if (!ModelState.IsValid)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, ModelState);
@@ -30,11 +29,7 @@ namespace DapperWith4DatabaseCommunication.Controllers
                     var orderData = await _ordersService.AddOrder(orderdto);
                     return StatusCode(StatusCodes.Status201Created, orderData);
                 }
-            }
-            catch (Exception ex)
-            {//if you got any error we are using this statuscode:Status500InternalServerError
-                return StatusCode(StatusCodes.Status500InternalServerError, "server not found");
-            }
+            
         }
         [HttpDelete]
         [Route("DeleteOrderByOrderid/{orderid}")]
@@ -44,9 +39,8 @@ namespace DapperWith4DatabaseCommunication.Controllers
             {//If input parameters are wrongly sent or empty, we will get 400 badrequest statuscode:Status400BadRequest
                 return StatusCode(StatusCodes.Status400BadRequest, "bad request");
             }
-            try
-            {
-                var orderData = await _ordersService.DeleteOrderById(orderid);
+         
+             var orderData = await _ordersService.DeleteOrderById(orderid);
 
                 if (orderData == null)
                 {//in db if you get empty data we need to retrun this statuscode:Status404NotFound
@@ -56,18 +50,14 @@ namespace DapperWith4DatabaseCommunication.Controllers
                 {
                     return StatusCode(StatusCodes.Status200OK, "deleted successfully");
                 }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "server not found");
-            }
+           
         }
         [HttpGet]
         [Route("GetOrders")]
         public async Task<IActionResult> GetOrder()
-        {
-            throw new Exception("Custom Exception: OrdersController: GetOrders Api method Excution Failed");
-            var orderdata = await _ordersService.GetOrders();
+        {//by using throw new Exception we can raise the custom error in our application, and this error will be handled by (GlobalErrorHandlerMiddleware) 
+            //throw new Exception("Custom Exception: OrdersController: GetOrders Api method Excution Failed");
+               var orderdata = await _ordersService.GetOrders();
                 if (orderdata == null)//here null means if you are not getting any data from db then we will return this statuscode:Status404NotFound
                 {
                     return StatusCode(StatusCodes.Status404NotFound, "orderData not found");
@@ -86,22 +76,15 @@ namespace DapperWith4DatabaseCommunication.Controllers
             {
                 return StatusCode(StatusCodes.Status400BadRequest, "bad request");
             }
-            try
-            {
-                var orderdata = await _ordersService.GetOrderById(orderid);
-                return StatusCode(StatusCodes.Status200OK, orderdata);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "server eror");
-            }
+              var orderdata = await _ordersService.GetOrderById(orderid);
+              return StatusCode(StatusCodes.Status200OK, orderdata);
+            
         }
         [HttpPut]
         [Route("UpdateOrder")]
         public async Task<IActionResult> put([FromBody] OrdersDto orderdto)
         {
-            try
-            {
+           
                 if (!ModelState.IsValid)
                 {
 
@@ -112,11 +95,6 @@ namespace DapperWith4DatabaseCommunication.Controllers
                     var orderData = await _ordersService.UpdateOrder(orderdto);
                     return StatusCode(StatusCodes.Status200OK, orderData);
                 }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "server not found");
-            }
         }
     }
 }
