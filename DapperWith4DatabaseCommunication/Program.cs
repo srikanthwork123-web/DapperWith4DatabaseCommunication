@@ -47,6 +47,18 @@ builder.Services.AddScoped<IOrdersService, OrdersService>();//register the servi
 //if you run the program,first it will call program.cs and it will load all the depencies into the memory and then it will inject those depencies to the controller class by using constructor injection and then we can use those depencies in the controller class to perform the required operations
 // If you want to add any depencencies to your Depencyinjection container. by using builder.services....we can register our dependicies to the container.
 
+//============enabling the cors at program.cs file of the web api project using the AddCors method   builder object. The AddCors method is used to add Cross-Origin Resource Sharing (CORS) services to the application, which allows you to specify which origins are allowed to access the API and what HTTP methods and headers are permitted in cross-origin requests.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
+
 #endregion
 //section2:app is the inbuilt request pipeline,heare we need to register our middlewares to application pipeline.
 //===================================================================================================================
@@ -88,6 +100,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();//Predefined Middlewares,created by the swagger team to generate the swagger documentation for the api.
     app.UseSwaggerUI();
 }
+//UseCors is a predefined middleware,created by the Microsoft team to handle the cross-origin resource sharing in the api level.
+app.UseCors("AllowAll");//add the cors middleware to the application pipeline and specify the policy name that we defined in the AddCors method of the builder object in the dependency injection container section.
 
 app.UseAuthorization();//Predefined Middlewares,created by the Microsoft team to handle the authorization in the api.
 
