@@ -49,15 +49,29 @@ builder.Services.AddScoped<IOrdersService, OrdersService>();//register the servi
 
 //============enabling the cors at program.cs file of the web api project using the AddCors method   builder object. The AddCors method is used to add Cross-Origin Resource Sharing (CORS) services to the application, which allows you to specify which origins are allowed to access the API and what HTTP methods and headers are permitted in cross-origin requests.
 builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
+{ //THIS CODE IS ACCESSING ALL ORIGINS,ALL METHODS,ALL HEADERS. IT IS NOT A GOOD PRACTICE TO ALLOW ALL ORIGINS,ALL METHODS,ALL HEADERS IN PRODUCTION ENVIRONMENT.BECAUSE IT CAN CAUSE SECURITY ISSUES IN YOUR APPLICATION. SO IN PRODUCTION ENVIRONMENT YOU SHOULD SPECIFY THE ORIGINS,METHODS,HEADERS THAT YOU WANT TO ALLOW IN YOUR APPLICATION.
+    options.AddDefaultPolicy(builder =>
     {
         builder.AllowAnyOrigin()
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
 });
-
+//WE ARE GIVING PERMISSIONS TO SPECIFIC ORIGINS, METHODS, HEADERS IN THE CORS POLICY. IT IS A GOOD PRACTICE TO ALLOW ONLY THE ORIGINS, METHODS, HEADERS THAT YOU WANT TO ALLOW IN YOUR APPLICATION TO AVOID SECURITY ISSUES IN YOUR APPLICATION.
+//string[] origins =
+//{
+//"https://ICICBANK.com",
+//"https://AXISBANK.com",
+//"https://HDFCBANK.com",
+//};
+//builder.Services.AddCors(options =>
+//{//Addpolicy mens we can define multiple policies as per our requirement and we can specify the policy name and then we can use that policy name in the app.useCors() method to enable the CORS for that specific policy.
+//    options.AddPolicy("bankPolicy", (builder) =>//this is the name of the policy, you can give any name to your policy as per your requirement and then you can use that policy name in the app.useCors() method to enable the CORS for that specific policy.
+//    {
+//        builder.WithOrigins(origins)
+//            .AllowAnyHeader().WithMethods("*");//=>Here* means it will allow "GET", "POST", "PUT", "DELETE".WithExposedHeaders("*");     
+//    });
+//});
 
 #endregion
 //section2:app is the inbuilt request pipeline,heare we need to register our middlewares to application pipeline.
@@ -101,8 +115,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 //UseCors is a predefined middleware,created by the Microsoft team to handle the cross-origin resource sharing in the api level.
-app.UseCors("AllowAll");//add the cors middleware to the application pipeline and specify the policy name that we defined in the AddCors method of the builder object in the dependency injection container section.
-
+app.UseCors();//add the cors middleware to the application pipeline and specify the policy name that we defined in the AddCors method of the builder object in the dependency injection container section.
+//app.UseCors("bankPolicy");//this cors is for specific policy,if you want to enable the cors for specific policy then you need to specify the policy name in the app.useCors() method like this way.
 app.UseAuthorization();//Predefined Middlewares,created by the Microsoft team to handle the authorization in the api.
 
 app.MapControllers();
