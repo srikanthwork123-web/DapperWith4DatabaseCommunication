@@ -46,7 +46,10 @@ builder.Services.AddScoped<IOrdersService, OrdersService>();//register the servi
 //builder is the inbuilt dependency injection container which is used to register the services and the repositories in the dependency injection container of the application and then we are building the application and running it.
 //if you run the program,first it will call program.cs and it will load all the depencies into the memory and then it will inject those depencies to the controller class by using constructor injection and then we can use those depencies in the controller class to perform the required operations
 // If you want to add any depencencies to your Depencyinjection container. by using builder.services....we can register our dependicies to the container.
-
+//======================
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+//=====================
 //============enabling the cors at program.cs file of the web api project using the AddCors method   builder object. The AddCors method is used to add Cross-Origin Resource Sharing (CORS) services to the application, which allows you to specify which origins are allowed to access the API and what HTTP methods and headers are permitted in cross-origin requests.
 builder.Services.AddCors(options =>
 { //THIS CODE IS ACCESSING ALL ORIGINS,ALL METHODS,ALL HEADERS. IT IS NOT A GOOD PRACTICE TO ALLOW ALL ORIGINS,ALL METHODS,ALL HEADERS IN PRODUCTION ENVIRONMENT.BECAUSE IT CAN CAUSE SECURITY ISSUES IN YOUR APPLICATION. SO IN PRODUCTION ENVIRONMENT YOU SHOULD SPECIFY THE ORIGINS,METHODS,HEADERS THAT YOU WANT TO ALLOW IN YOUR APPLICATION.
