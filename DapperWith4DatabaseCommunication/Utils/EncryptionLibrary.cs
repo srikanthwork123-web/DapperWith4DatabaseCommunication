@@ -6,6 +6,7 @@ namespace DapperWith4DatabaseCommunication.Utils
     public static class EncryptionLibrary
     {
         //AES (Advanced Encryption Standard) Algorithms
+        // This method encrypts the input text using AES encryption and returns the encrypted string in Base64 format.
         public static string EncryptText(string inputText)
         {
             try
@@ -29,6 +30,7 @@ namespace DapperWith4DatabaseCommunication.Utils
             }
         }
 
+        // This method decrypts the input text (which is in Base64 format) using AES decryption and returns the original string.
         public static string DecryptText(string inputText)
         {
             try
@@ -50,6 +52,8 @@ namespace DapperWith4DatabaseCommunication.Utils
                 throw;
             }
         }
+
+
         private static byte[] AES_Encrypt(byte[] bytesToBeEncrypted, byte[] passwordBytes)
         {
             byte[] encryptedBytes = null;

@@ -50,6 +50,14 @@ builder.Services.AddScoped<IOrdersService, OrdersService>();//register the servi
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 //=====================
+//======================
+builder.Services.AddScoped<IRolesRepository, RolesRepository>();
+builder.Services.AddScoped<IRolesService, RolesService>();
+//=====================
+//======================
+builder.Services.AddScoped<IAuthenticateRepository, AuthenticateRepository>();
+builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
+//=====================
 //============enabling the cors at program.cs file of the web api project using the AddCors method   builder object. The AddCors method is used to add Cross-Origin Resource Sharing (CORS) services to the application, which allows you to specify which origins are allowed to access the API and what HTTP methods and headers are permitted in cross-origin requests.
 builder.Services.AddCors(options =>
 { //THIS CODE IS ACCESSING ALL ORIGINS,ALL METHODS,ALL HEADERS. IT IS NOT A GOOD PRACTICE TO ALLOW ALL ORIGINS,ALL METHODS,ALL HEADERS IN PRODUCTION ENVIRONMENT.BECAUSE IT CAN CAUSE SECURITY ISSUES IN YOUR APPLICATION. SO IN PRODUCTION ENVIRONMENT YOU SHOULD SPECIFY THE ORIGINS,METHODS,HEADERS THAT YOU WANT TO ALLOW IN YOUR APPLICATION.
