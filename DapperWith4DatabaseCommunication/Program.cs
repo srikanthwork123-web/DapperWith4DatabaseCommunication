@@ -3,7 +3,11 @@ using DapperWith4DatabaseCommunication.Interfaces;
 using DapperWith4DatabaseCommunication.Middlewares;
 using DapperWith4DatabaseCommunication.Repositories;
 using DapperWith4DatabaseCommunication.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Text;
 //this program.cs is divided into 2 sections.
 //===========================================================
 //section1:builder is the inbuilt depency injection conatiner.we need to register our all application/Project level depencies into our inbuilt depency injection container.
@@ -19,6 +23,31 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//================================Token based Authentication code added here========
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+//builder.Services.AddAuthorization();
+builder.Services.AddSwaggerGen(c =>
+c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+{
+    Name = "Authorization",
+    Type = SecuritySchemeType.Http,
+    Scheme = "Bearer",
+    BearerFormat = "JWT",
+    In = ParameterLocation.Header,
+    Description = "Please Enter Token value",
+}));
 //========================================================================
 //We need to register Serilog to our dependency Injection Conatiner. The UseSerilog method is used to configure Serilog as the logging provider for the application. The configuration.ReadFrom.Configuration(context.Configuration) part tells Serilog to read its configuration settings from the application's configuration, which can be defined in appsettings.json or other configuration sources.
 builder.Host.UseSerilog((context, configuration) =>
@@ -128,7 +157,8 @@ if (app.Environment.IsDevelopment())
 //UseCors is a predefined middleware,created by the Microsoft team to handle the cross-origin resource sharing in the api level.
 app.UseCors();//add the cors middleware to the application pipeline and specify the policy name that we defined in the AddCors method of the builder object in the dependency injection container section.
 //app.UseCors("bankPolicy");//this cors is for specific policy,if you want to enable the cors for specific policy then you need to specify the policy name in the app.useCors() method like this way.
-app.UseAuthorization();//Predefined Middlewares,created by the Microsoft team to handle the authorization in the api.
+app.UseAuthentication();//This is predefined Middleware,created by the Microsoft team to handle the Authentication in the api.
+app.UseAuthorization();//this is Predefined Middlewares,created by the Microsoft team to handle the Authorization in the api.
 
 app.MapControllers();
 

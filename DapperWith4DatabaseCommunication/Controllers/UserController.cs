@@ -20,7 +20,7 @@ namespace DapperWith4DatabaseCommunication.Controllers
 
         #region User Registration
         /// <summary>  //Summary describes what this method will do, its parameters, and return type. It provides a clear understanding of the method's purpose and functionality to developers who may be using or maintaining the code in the future.
-        /// This API is used to register a new user in the system. 
+        /// This API is used to register a new user in the Database. 
         /// It accepts a UsersDTO object containing user details such as username, password, email, address, phone number, and active status.
         /// The API validates the input and calls the UserResgistration method of the IUserService to perform the registration logic. If the registration is successful, it returns an OK response with the result; otherwise, it returns appropriate error responses based on the validation or exceptions encountered.
         /// </summary>
