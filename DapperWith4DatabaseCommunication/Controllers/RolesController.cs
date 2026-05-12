@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DapperWith4DatabaseCommunication.Controllers
 {
+    //if you are not applying [Authorize] attribute here,any one can access my apis.
+    //eventhogh if you are implemented token based authentication,if you forget to mention [authorize] attribute here,any one can access your apis.
+    //here we are not mentioned [Authorize] attribute due to that any one can access this api,without token
     [Route("api/[controller]")]
     [ApiController]
     public class RolesController : ControllerBase
