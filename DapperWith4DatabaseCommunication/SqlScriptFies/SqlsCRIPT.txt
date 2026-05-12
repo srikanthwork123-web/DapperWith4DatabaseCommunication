@@ -1,4 +1,5 @@
 ﻿---PLEASE RUN THIS SCRIPT IN HOTEL MANAGEMENT DATABASE--------------
+GO
 create table ProjectLevelLog(Id int identity(1,1) primary key,username varchar(100),LogLevel varchar(max),MessageTemplate varchar(max),LogDate datetime)
 Go
 
@@ -11,3 +12,17 @@ end
 Go
 Select * from ProjectLevelLog
 GO
+-----------
+//======Database script for adding username column=========
+Go
+alter table ProjectLevelErrorlog add username varchar(max)
+Go
+Alter  Procedure Usp_AddProjectLevelErrorlog(@StatusCode varchar(max),@ErrorMessage varchar(max),@StackTraceError varchar(max),@InnerExceptionError varchar(max),@username varchar(max)=null )  
+as begin  
+Set nocount on --it prevents the no of rows effected.  
+  
+insert into ProjectLevelErrorlog(StatusCode, ErrorMessage, StackTraceError,InnerExceptionError,ErrorLogTime,username)values(@StatusCode,@ErrorMessage,@StackTraceError,@InnerExceptionError,GETDATE(),@username)  
+end 
+-------------------
+
+ 

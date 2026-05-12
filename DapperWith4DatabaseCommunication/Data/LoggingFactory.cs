@@ -33,7 +33,7 @@ namespace DapperWith4DatabaseCommunication.Data
 
         }
 
-        public async Task<bool> AddProjectLevelErrorlogAsync(string statusCode, string ErrorMessage, string StackTraceError,string InnerExceptionError)
+        public async Task<bool> AddProjectLevelErrorlogAsync(string statusCode, string ErrorMessage, string StackTraceError,string InnerExceptionError,string username)
         {
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
@@ -43,6 +43,7 @@ namespace DapperWith4DatabaseCommunication.Data
                 p.Add(StoredprocedureParameters.ErrorLog_ErrorMessage, ErrorMessage);
                 p.Add(StoredprocedureParameters.ErrorLog_StackTraceError, StackTraceError);
                 p.Add(StoredprocedureParameters.ErrorLog_InnerExceptionError, InnerExceptionError);
+                p.Add(StoredprocedureParameters.ErrorLog_UserName, username);//Here pass the username to Storedprocedure.
                 await con.ExecuteScalarAsync(Storedprocedurenames.AddProjectLevelErrorlog, p, commandType: CommandType.StoredProcedure);
                 return true;
             }

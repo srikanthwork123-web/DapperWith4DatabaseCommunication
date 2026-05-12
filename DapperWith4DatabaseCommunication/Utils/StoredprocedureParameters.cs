@@ -44,6 +44,7 @@ namespace DapperWith4DatabaseCommunication.Utils
         public static string ErrorLog_ErrorMessage = "@ErrorMessage";
         public static string ErrorLog_StackTraceError = "@StackTraceError";
         public static string ErrorLog_InnerExceptionError = "@InnerExceptionError";
+        public static string ErrorLog_UserName = "@username";
         #endregion
     }
 }
