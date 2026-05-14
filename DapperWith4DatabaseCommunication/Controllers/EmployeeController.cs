@@ -1,6 +1,7 @@
 ﻿using DapperWith4DatabaseCommunication.Data;
 using DapperWith4DatabaseCommunication.Dtos;
 using DapperWith4DatabaseCommunication.Interfaces;
+using DapperWith4DatabaseCommunication.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -37,9 +38,9 @@ namespace DapperWith4DatabaseCommunication.Controllers
             var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
 
             #region Serilog Logging the mesages 
-            Log.Information("EmployeeController: Post Api method Excution Starts and Current Loggedin username:",userName);
-            Log.Information("EmployeeController: Post Api method Inputparamter EmployeeName:", empdto.empname);
-            Log.Information("EmployeeController: Post Api method Inputparamter EmployeeSalary:", empdto.empsalary);
+            Log.Information($"EmployeeController: Post Api method Excution Starts and Current Loggedin username:{userName}");
+            Log.Information($"EmployeeController: Post Api method Inputparamter EmployeeName: {empdto.empname}");
+            Log.Information($"EmployeeController: Post Api method Inputparamter EmployeeSalary:{empdto.empsalary}");
             #endregion
 
             #region Database Logging the mesages using custom logging factory
@@ -47,20 +48,25 @@ namespace DapperWith4DatabaseCommunication.Controllers
             await _loggingFactory.AddLoggingMessages(userName, "Information", $"Post Api method  Inputparamter EmployeeName:{empdto.empname}");//logg the message in database using custom logging factory
             await _loggingFactory.AddLoggingMessages(userName, "Information", $"Post Api method Inputparamter EmployeeSalary:{empdto.empsalary}");//logg the message in database using custom logging factory
             #endregion
-             #region CustomError Raising Example
+
+        var validationMessages= ValidationMessages.AddEmployee(empdto);
+            if (validationMessages.Length > 0)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, Convert.ToString(validationMessages));
+            }
+                //throw new Exception("Custom Exception: EmployeeController: Post Api method Excution Failed");
+                //if (!ModelState.IsValid)
+                //{
+                //    return StatusCode(StatusCodes.Status400BadRequest, ModelState);
+                //}
+                else
+                {
+                #region CustomError Raising Example
                 int a = 10, b = 0;
                 int result = a / b; //this will throw an exception because we are dividing by zero exception
                 #endregion
-
-                //throw new Exception("Custom Exception: EmployeeController: Post Api method Excution Failed");
-                if (!ModelState.IsValid)
-                {
-                    return StatusCode(StatusCodes.Status400BadRequest, ModelState);
-                }
-                else
-                {
-                    var empdata = await _employeeService.AddEmployes(empdto);
-                    Log.Information("EmployeeController: Post Api method Excution Ended and Current Loggedin username:",userName);//logg the message in text file using serilog
+                var empdata = await _employeeService.AddEmployes(empdto);
+                    Log.Information($"EmployeeController: Post Api method Excution Ended and Current Loggedin username:{userName}");//logg the message in text file using serilog
                     await _loggingFactory.AddLoggingMessages(userName, "Information", "Post Api method Excution Ended");//logg the message in database using custom logging factory
                     return StatusCode(StatusCodes.Status201Created, empdata);
                 }
@@ -72,8 +78,8 @@ namespace DapperWith4DatabaseCommunication.Controllers
             //here read the username from token and this username used for logging purpose.
             var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
             #region Serilog Logging the mesages 
-            Log.Information("EmployeeController: delete Api method Excution Starts and Current Loggedin username:", userName);//logg the message in text file using serilog
-            Log.Information("EmployeeController: delete Api method Inputparamter empid is", empid);//here capture th empid 
+            Log.Information($"EmployeeController: delete Api method Excution Starts and Current Loggedin username:{userName}");//logg the message in text file using serilog
+            Log.Information($"EmployeeController: delete Api method Inputparamter empid is{empid}");//here capture th empid 
             
             #endregion
 
@@ -90,13 +96,13 @@ namespace DapperWith4DatabaseCommunication.Controllers
                 var empdata = await _employeeService.DeleteEmployesById(empid);
                 if (empdata == null)
                 {//in db if you get empty data we need to retrun this statuscode:Status404NotFound
-                Log.Information("EmployeeController: delete Api method Excution Starts and Current Loggedin username:", userName);//logg the message in text file using serilog
+                Log.Information($"EmployeeController: delete Api method Excution Starts and Current Loggedin username:{userName}");//logg the message in text file using serilog
                 await _loggingFactory.AddLoggingMessages(userName, "Information", "delete Api method Excution Ended");//logg the message in database using custom logging factory
                 return StatusCode(StatusCodes.Status404NotFound, "empdata not  found");
                 }
                 else
                 {
-                Log.Information("EmployeeController: delete Api method Excution Starts and Current Loggedin username:", userName);//logg the message in text file using serilog
+                Log.Information($"EmployeeController: delete Api method Excution Starts and Current Loggedin username:{userName}");//logg the message in text file using serilog
                 await _loggingFactory.AddLoggingMessages(userName, "Information", "delete Api method Excution Ended");//logg the message in database using custom logging factory
                 return StatusCode(StatusCodes.Status200OK, "deleted successfully");
                 }
@@ -140,7 +146,7 @@ namespace DapperWith4DatabaseCommunication.Controllers
             var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
 
             #region Serilog Logging the mesages 
-            Log.Information("EmployeeController: GetEmployees Api method Excution Starts and Current Loggedin username:", userName);
+            Log.Information($"EmployeeController: GetEmployees Api method Excution Starts and Current Loggedin username:{userName}");
             #endregion
 
             #region Database Logging the mesages using custom logging factory
@@ -149,13 +155,13 @@ namespace DapperWith4DatabaseCommunication.Controllers
                 var empdata = await _employeeService.GetEmployees();
                 if (empdata == null)
                 {
-                Log.Information("EmployeeController: GetEmployees Api method Excution Ended and Current Loggedin username:", userName);//logg the message in text file using serilog
+                Log.Information($"EmployeeController: GetEmployees Api method Excution Ended and Current Loggedin username:{userName}");//logg the message in text file using serilog
                 await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeController: GetEmployees Api method Excution Ended");//logg the message in database using custom logging factory
                 return StatusCode(StatusCodes.Status400BadRequest, "bad request");
                 }
                 else
                 {
-                Log.Information("EmployeeController: GetEmployees Api method Excution Ended and Current Loggedin username:", userName);//logg the message in text file using serilog
+                Log.Information($"EmployeeController: GetEmployees Api method Excution Ended and Current Loggedin username:{userName}");//logg the message in text file using serilog
                 await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeController: GetEmployees Api method Excution Ended");//logg the message in database using custom logging factory
                 return StatusCode(StatusCodes.Status200OK, empdata);
                 }
@@ -167,8 +173,8 @@ namespace DapperWith4DatabaseCommunication.Controllers
             //here read the username from token and this username used for logging purpose.
             var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
             #region Serilog Logging the mesages 
-            Log.Information("EmployeeController: Get Api method Excution Starts and Current Loggedin username:", userName);//logg the message in text file using serilog
-            Log.Information("EmployeeController: Get Api method Inputparamter empid is", empid);//here capture th empid 
+            Log.Information($"EmployeeController: Get Api method Excution Starts and Current Loggedin username:{userName}");//logg the message in text file using serilog
+            Log.Information($"EmployeeController: Get Api method Inputparamter empid is {empid}");//here capture th empid 
 
             #endregion
 
@@ -184,7 +190,7 @@ namespace DapperWith4DatabaseCommunication.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest, "bad request");
             }
             var empdata = await _employeeService.GetEmployeeById(empid);
-            Log.Information("EmployeeController: Get Api method Excution Ended and Current Loggedin username:", userName);//logg the message in text file using serilog
+            Log.Information($"EmployeeController: Get Api method Excution Ended and Current Loggedin username:{userName}");//logg the message in text file using serilog
             await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeController: Get Api method Excution Ended");//logg the message in database using custom logging factory
             return StatusCode(StatusCodes.Status200OK, empdata);
         }
@@ -195,10 +201,10 @@ namespace DapperWith4DatabaseCommunication.Controllers
             //here read the username from token and this username used for logging purpose.
             var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
             #region Serilog Logging the mesages 
-            Log.Information("EmployeeController: put Api method Excution Starts and Current Loggedin username:", userName);//logg the message in text file using serilog
-            Log.Information("EmployeeController: put Api method Inputparamter empdto.empid is", empdto.empid);//here capture th empid 
-            Log.Information("EmployeeController: put Api method Inputparamter empdto.empname is", empdto.empname);//here capture th empid
-            Log.Information("EmployeeController: put Api method Inputparamter empdto.empsalary is", empdto.empsalary);//here capture th empid
+            Log.Information($"EmployeeController: put Api method Excution Starts and Current Loggedin username:{userName}");//logg the message in text file using serilog
+            Log.Information($"EmployeeController: put Api method Inputparamter empdto.empid is {empdto.empid}");//here capture th empid 
+            Log.Information($"EmployeeController: put Api method Inputparamter empdto.empname is {empdto.empname}");//here capture th empid
+            Log.Information($"EmployeeController: put Api method Inputparamter empdto.empsalary is {empdto.empsalary}");//here capture th empid
             #endregion
 
             #region Database Logging the mesages using custom logging factory
@@ -210,13 +216,12 @@ namespace DapperWith4DatabaseCommunication.Controllers
             #endregion
             if (!ModelState.IsValid)
                 {
-
                     return StatusCode(StatusCodes.Status400BadRequest, ModelState);
                 }
                 else
                 {
                     var empdata = await _employeeService.UpdateEmploye(empdto);
-                Log.Information("EmployeeController: put Api method Excution Ended and Current Loggedin username:", userName);//logg the message in text file using serilog
+                Log.Information($"EmployeeController: put Api method Excution Ended and Current Loggedin username:{userName}");//logg the message in text file using serilog
                 await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeController:put Api method Excution Ended");//logg the message in database using custom logging factory
                 return StatusCode(StatusCodes.Status200OK, empdata);
                 }
