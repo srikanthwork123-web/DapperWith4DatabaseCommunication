@@ -19,6 +19,9 @@ namespace DapperWith4DatabaseCommunication.Repositories
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
                 var encryptText = EncryptionLibrary.EncryptText(usersObj.Password);
+                //==========******For Testing Point of view you  can see the  decrypt text=======
+                var decryptText = EncryptionLibrary.DecryptText(encryptText);
+                //===========================================================================
                 var p = new DynamicParameters();
                 p.Add("@UserName", usersObj.UserName);
                 p.Add("@Password", encryptText);//here pass the encrypted string to store in database.password is secure

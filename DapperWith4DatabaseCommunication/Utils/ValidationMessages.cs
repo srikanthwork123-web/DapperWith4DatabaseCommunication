@@ -56,7 +56,14 @@ namespace DapperWith4DatabaseCommunication.Utils
         }
     }
 }
-
+/*
+ * 1.what is validation,how do you implemnet?
+ * A)Validation means verifying the input fileds,mandatory or not.
+ * =>if the field is mandatory we need check the value  of the filed.
+ * if the filed does not contain any value then we need to raise a validation messages for that one.
+ * =>here some fileds are optional,those fileds you can ignore to apply the validations.
+ * =>whatever the fileds are mandatory you can write validation for those fileds,if not mandatory,you can ignore those fileds for validation.
+ */
 
 
 

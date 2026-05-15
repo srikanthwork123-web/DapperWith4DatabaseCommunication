@@ -18,6 +18,9 @@ namespace DapperWith4DatabaseCommunication.Repositories
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
                 var encryptText = EncryptionLibrary.EncryptText(loginDTOObj.Password);
+                //==========******For Testing Point of view you  can see the  decrypt text=======
+                var decryptText = EncryptionLibrary.DecryptText(encryptText);
+                //===========================================================================
                 var p = new DynamicParameters();
                 p.Add("@UserName", loginDTOObj.UserName);
                 p.Add("@Password", encryptText);
