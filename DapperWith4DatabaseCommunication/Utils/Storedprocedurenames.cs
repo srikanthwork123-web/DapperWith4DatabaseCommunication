@@ -1,5 +1,11 @@
 ﻿namespace DapperWith4DatabaseCommunication.Utils
 {
+    //whenever the no of objects creations are increased automatically perfomence of application decresed.
+    //maximum if you write any code try to avoid the object creation .
+    //if you use static clas ,no need to create object for static class.
+    //because whenever compiler see the static keyword it loads all static related variables and mehods.
+    //we can call the static variables using(static classname.variablename) and methods using(staticclassname.methodname())
+    //Here to call the static related things no need to create object,due to that perfomance also increased.
     public static class Storedprocedurenames
     {//#region is used to grouping the code at one place  for better organization and readability.(singleline statement for interview purpose)
      //============================================================================================
