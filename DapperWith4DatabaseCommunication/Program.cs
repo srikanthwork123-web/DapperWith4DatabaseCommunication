@@ -48,7 +48,7 @@ c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecuritySc
     In = ParameterLocation.Header,
     Description = "Please Enter Token value",
 }));
-//=======================================================================
+//=====================If you want to read the username from token you must add the below line of code ==================================================
 builder.Services.AddHttpContextAccessor();
 //========================================================================
 //We need to register Serilog to our dependency Injection Conatiner. The UseSerilog method is used to configure Serilog as the logging provider for the application. The configuration.ReadFrom.Configuration(context.Configuration) part tells Serilog to read its configuration settings from the application's configuration, which can be defined in appsettings.json or other configuration sources.

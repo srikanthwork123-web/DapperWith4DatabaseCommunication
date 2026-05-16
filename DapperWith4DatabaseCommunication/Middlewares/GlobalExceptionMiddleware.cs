@@ -28,6 +28,7 @@ namespace DapperWith4DatabaseCommunication.Middlewares
           Process the response after the next middleware completes.
          * 
          */
+//Note:if you want to use any Interface methods into any other class,you must inject/pass the interface to constructor of that class.like below.
         public GlobalExceptionMiddleware(RequestDelegate next, ILoggingFactory loggingFactory, IHttpContextAccessor httpContextAccessor)
         {//inject the RequestDelegate into the constructor to allow the middleware to call the next middleware in the pipeline.
             _next = next;
