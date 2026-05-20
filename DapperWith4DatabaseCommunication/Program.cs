@@ -218,15 +218,15 @@ and also  we can log that exception in azure cloud by using azure application in
 1.what is th diffrence between app.use() and app.run() and app.map() methods in the program.cs file of the web api project?
 A)=>app.use():
 ==============
-method is used to add the middleware to the application pipeline and it will call the next middleware in the pipeline by using next.invoke() method. 
+use method is used to add the middleware to the application pipeline and it will call the next middleware in the pipeline by using next.invoke() method. 
 if you are not calling next.invoke() method in the app.use() method, it will not call the next middleware in the pipeline and it will stop the execution of the middleware.
 B)=>app.run():
 =================
-method is a terminal middleware, it ends the application pipeline without calling the next middleware.
+run method is a terminal middleware, it ends the application pipeline without calling the next middleware.
 always app.run() is last in program.cs file.
 C)=>app.map():
 ===============
-method is used to branch the request pipeline based on the request path. 
+map method is used to branch the request pipeline based on the request path. 
 it allows you to define different middleware pipelines for different request paths.
 
 
