@@ -90,5 +90,46 @@ namespace DapperWith4DatabaseCommunication.Controllers
         }
     }
 }
-/* what  type of authentication you have implemeted in your project?
+/* 1.what  type of authentication you have implemeted in your project?
+ * A)Jwt token based authentication implemented in my project.
+ * =>By using Jwt Token based authentication we can provide the security to my  api's.
+ * =>Without token you can't access my api's.Token is require to access my api's.
+ * 2)How to implement token based authentication in your project?
+ * A)In my project I have implemented Jwt token based authentication.
+ * =>To implement token based authentication first install "Microsoft.AspNetCore.Authentication.JwtBearer" package in your project.
+ * =>Next create one authenticatecontroller and in that write usersigin  Api method and pass LoginDto  class.
+ * =>Next  we need to validate username and password is exist or not  in the database.
+ * =>once user is  exist in db we return successmessage to api method alone with status code 200,after that based on username we can fetch required userinformation like (username,roles,email..)data we can fetch.
+ * =>Next we need to store this userinfomration in the claims[] array.
+ * =>Next  in appsettings.json we need to write one Jwt json object,which contain (key,issuer,audience,Subject an token expiry time keys)these are used in our token prepartion code.
+ ======================================just for understanding=======================    
+"Jwt": { //To prepare the token the below key values information is required.
+    "Key": "Yh2k7QSu4l8CZg5p6X3Pna9L0Miy4D3Bvt0JVr87UcOj69Kqw5R2Nmf4FWs03Hdx",
+    "Issuer": "JWTAuthenticationServer",
+    "Audience": "JWTServicePostmanClient",
+    "Subject": "JWTServiceAccessToken",
+    "TokenExpriyTime": 4
+  },
+=====================================================================================
+=>we have one predefined class called SymmetricSecurityKey we need to create object for that one  and pass the key.which  is read from appsetting.json file
+=>this  SymmetricSecurityKey   object need to pass argument for SigningCredentials predefined class object and pass HmacSha256 SecurityAlgorithm.to encrypt the data purpose we need this HmacSha256 SecurityAlgorithm.
+=>After that create object for JwtSecurityToken predefined class and pass Issuer,Audience,claims,TokenExpriyTime,signingCredentials.
+=>next create object for JwtSecurityTokenHandler class it contains WriteToken() method you need  to pass JwtSecurityToken object. this will prepare  new token.
+=>token is encrypt format,it contains all userinformation in encrypt format.this token we are returning from api.
+=>this token used in Angular/react/mobile applications for each and every request they will send access our apis.
+=>without token you can't get the api information.
+=>next put[Authorize] attribute  for required controllers above .if you are not apply this [Authorize] attribute,everyone can access our api's
+=>to validate the token in program.cs we need to write code in   builder.Services.AddAuthentication section we have one TokenValidationParameters class is there,
+here we need to check whatever the token you passed that contains issuer,audience,jwt key is there or not,it should match with token prepartion time Whatever we are provided key,issuer,audience.
+=>once this issuer,audeience,jwt key matched then only you can access the data from api.
+=>if these are not matched it will return 401 unauthorized messgae from api.
+===========================================================
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+===============================================================
+
+ * 
  */
