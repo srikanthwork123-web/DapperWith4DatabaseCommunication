@@ -1,26 +1,32 @@
-﻿using Dapper;//Import the dapper namespace to use the dapper extension methods for executing SQL queries and commands.
-using DapperWith4DatabaseCommunication.Data;
+﻿using Dapper;
 using DapperWith4DatabaseCommunication.Interfaces;
 using DapperWith4DatabaseCommunication.Models;
 using DapperWith4DatabaseCommunication.Utils;
 using Serilog;
 using System.Data;
+
 namespace DapperWith4DatabaseCommunication.Repositories
 {
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly IConnectionFactory _connectionFactory;
         private readonly ILoggingFactory _loggingFactory;
-        public EmployeeRepository(IConnectionFactory connectionFactory, ILoggingFactory loggingFactory)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+
+        public EmployeeRepository(IConnectionFactory connectionFactory, ILoggingFactory loggingFactory, IHttpContextAccessor httpContextAccessor)
         {
             _connectionFactory = connectionFactory;
             _loggingFactory = loggingFactory;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<int> AddEmployes(Employee empdetail)
         {
-            Log.Information("EmployeeRepository: AddEmployes method Excution Starts");
-            await _loggingFactory.AddLoggingMessages("chandu", "Information", "EmployeeRepository: AddEmployes method Excution Starts");//logg the message in database using custom logging factory
-            //we need to store the Sqlconnection object into IDbConnection Refrence Variable to use the dapper extension methods for executing SQL queries and commands.
+            var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
+
+            Log.Information($"EmployeeRepository: AddEmployees method Excution Starts and Current Loggedin username:{userName}");
+            await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: AddEmployees method Excution Starts");//logg the message in database using custom logging factory
+
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
                 //In Dapper we will use the DynamicParameters class to pass data to the stored procedure input parameters.
@@ -33,60 +39,102 @@ namespace DapperWith4DatabaseCommunication.Repositories
                 parameters.Add(StoredprocedureParameters.Insertedvariable, DbType.Int32, direction: ParameterDirection.Output);
                 await con.ExecuteScalarAsync<int>(Storedprocedurenames.AddEmployee, parameters, commandType: CommandType.StoredProcedure);
                 int inserterdid = parameters.Get<int>(StoredprocedureParameters.Insertedvariable);
-                Log.Information("EmployeeRepository: AddEmployes method Excution Ended");
-                await _loggingFactory.AddLoggingMessages("chandu", "Information", "EmployeeRepository: AddEmployes method Excution Ended");//logg the message in database using custom logging factory
 
-                Log.Information("EmployeeRepository: AddEmployes method Excution Ended and Insertedrecord is{@Insertedrecord}", inserterdid);
-                await _loggingFactory.AddLoggingMessages("chandu", "Information", $"EmployeeRepository: AddEmployes method Excution Ended and Insertedrecord is {inserterdid}");//logg the message in database using custom logging factory
+                Log.Information($"EmployeeRepository: AddEmployees method Excution Ended and Current Loggedin username:{userName}");
+                await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: AddEmployees method Excution Ended");//logg the message in database using custom logging factory
+
+                Log.Information($"EmployeeRepository: AddEmployees method Excution Ended and Insertedrecord is {inserterdid}");
+                await _loggingFactory.AddLoggingMessages(userName, "Information", $"EmployeeRepository: AddEmployees method Excution Ended and Insertedrecord is {inserterdid}");//logg the message in database using custom logging factory
                 return inserterdid;
+
             }
+
         }
+
         public async Task<bool> DeleteEmployesById(int empid)
         {
+            var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
+
+            Log.Information($"EmployeeRepository: DeleteEmployeeById method Excution Starts and Current Loggedin username:{userName}");
+            await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: DeleteEmployeeById method Excution Starts");//logg the message in database using custom logging factory
+
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
                 DynamicParameters p = new DynamicParameters();
                 p.Add(StoredprocedureParameters.EmployeeID, empid);
                 await con.ExecuteScalarAsync(Storedprocedurenames.DeleteEmployee, p, commandType: CommandType.StoredProcedure);
+                Log.Information($"EmployeeRepository: DeleteEmployeeById method Excution Ended and Current Loggedin username:{userName}");
+                await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: DeleteEmployeeById method Excution Ended");//logg the message in database using custom logging factory
+
                 return true;
             }
+
         }
 
         public async Task<Employee> GetEmployeeById(int empid)
         {
-            
+            var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
+
+            Log.Information($"EmployeeRepository: GetEmployeeById method Excution Starts and Current Loggedin username:{userName}");
+            await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: GetEmployeeById method Excution Starts");//logg the message in database using custom logging factory
+
+
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
                 var p = new DynamicParameters();
                 p.Add(StoredprocedureParameters.EmployeeID, empid);
                 var result = await con.QueryAsync<Employee>(Storedprocedurenames.GetEmployeeByEmpid, p, commandType: CommandType.StoredProcedure);
                 Employee emp = result.FirstOrDefault();//FirstOrDefault() it will return the first element of the sequence or a default value if the sequence contains no elements. In this case, it will return the first Employee object from the result set or null if there are no matching records.
+                Log.Information($"EmployeeRepository: GetEmployeeById method Excution Ended and Current Loggedin username:{userName}");
+                await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: GetEmployeeById method Excution Ended");//logg the message in database using custom logging factory
+
+
                 return emp;
             }
+
         }
 
         public async Task<List<Employee>> GetEmployees()
         {
+            var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
+
+            Log.Information($"EmployeeRepository: GetEmployees method Excution Starts and Current Loggedin username:{userName}");
+            await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: GetEmployees method Excution Starts ");//logg the message in database using custom logging factory
+
             using (IDbConnection conn = _connectionFactory.HotelmanagementsqlConnectionString())
             {
                 var queryresult = await conn.QueryAsync<Employee>(Storedprocedurenames.GetEmployee, CommandType.StoredProcedure);
                 List<Employee> res = queryresult.ToList();
+                Log.Information($"EmployeeRepository: GetEmployees method Excution Ended   and Current Loggedin username:{userName}");
+                await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: GetEmployees method Excution Ended");//logg the message in database using custom logging factory
+
                 return res;
             }
+
         }
 
         public async Task<bool> UpdateEmploye(Employee empdetail)
         {
+            var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
+
+            Log.Information($"EmployeeRepository:UpdateEmployee  method Excution Starts and Current Loggedin username:{userName}");
+            await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: UpdateEmployee method Excution Starts");//logg the message in database using custom logging factory
+
             using (IDbConnection con = _connectionFactory.HotelmanagementsqlConnectionString())
             {
-                //"@empid"  =>we called this is hardcoding string.Don't write like this way.always read it from static class
                 var p = new DynamicParameters();
                 p.Add(StoredprocedureParameters.EmployeeID, empdetail.empid);
                 p.Add(StoredprocedureParameters.EmployeeName, empdetail.empname);
                 p.Add(StoredprocedureParameters.EmployeeSalary, empdetail.empsalary);
                 await con.ExecuteReaderAsync(Storedprocedurenames.UpdateEmployee, p, commandType: CommandType.StoredProcedure);
+
+                Log.Information($"EmployeeRepository:UpdateEmployee method Excution Ended and Current Loggedin username:{userName}");
+                await _loggingFactory.AddLoggingMessages(userName, "Information", "EmployeeRepository: UpdateEmployee method Excution Ended");//logg the message in database using custom logging factory
+
+
                 return true;
             }
+
         }
     }
 }

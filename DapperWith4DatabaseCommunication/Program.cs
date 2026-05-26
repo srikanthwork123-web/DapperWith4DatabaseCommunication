@@ -3,7 +3,11 @@ using DapperWith4DatabaseCommunication.Interfaces;
 using DapperWith4DatabaseCommunication.Middlewares;
 using DapperWith4DatabaseCommunication.Repositories;
 using DapperWith4DatabaseCommunication.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Text;
 //this program.cs is divided into 2 sections.
 //===========================================================
 //section1:builder is the inbuilt depency injection conatiner.we need to register our all application/Project level depencies into our inbuilt depency injection container.
@@ -19,6 +23,33 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//================================Token based Authentication code added here========
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+//builder.Services.AddAuthorization();
+builder.Services.AddSwaggerGen(c =>
+c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+{
+    Name = "Authorization",
+    Type = SecuritySchemeType.Http,
+    Scheme = "Bearer",
+    BearerFormat = "JWT",
+    In = ParameterLocation.Header,
+    Description = "Please Enter Token value",
+}));
+//=====================If you want to read the username from token you must add the below line of code ==================================================
+builder.Services.AddHttpContextAccessor();
 //========================================================================
 //We need to register Serilog to our dependency Injection Conatiner. The UseSerilog method is used to configure Serilog as the logging provider for the application. The configuration.ReadFrom.Configuration(context.Configuration) part tells Serilog to read its configuration settings from the application's configuration, which can be defined in appsettings.json or other configuration sources.
 builder.Host.UseSerilog((context, configuration) =>
@@ -46,7 +77,18 @@ builder.Services.AddScoped<IOrdersService, OrdersService>();//register the servi
 //builder is the inbuilt dependency injection container which is used to register the services and the repositories in the dependency injection container of the application and then we are building the application and running it.
 //if you run the program,first it will call program.cs and it will load all the depencies into the memory and then it will inject those depencies to the controller class by using constructor injection and then we can use those depencies in the controller class to perform the required operations
 // If you want to add any depencencies to your Depencyinjection container. by using builder.services....we can register our dependicies to the container.
-
+//======================
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+//=====================
+//======================
+builder.Services.AddScoped<IRolesRepository, RolesRepository>();
+builder.Services.AddScoped<IRolesService, RolesService>();
+//=====================
+//======================
+builder.Services.AddScoped<IAuthenticateRepository, AuthenticateRepository>();
+builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
+//=====================
 //============enabling the cors at program.cs file of the web api project using the AddCors method   builder object. The AddCors method is used to add Cross-Origin Resource Sharing (CORS) services to the application, which allows you to specify which origins are allowed to access the API and what HTTP methods and headers are permitted in cross-origin requests.
 builder.Services.AddCors(options =>
 { //THIS CODE IS ACCESSING ALL ORIGINS,ALL METHODS,ALL HEADERS. IT IS NOT A GOOD PRACTICE TO ALLOW ALL ORIGINS,ALL METHODS,ALL HEADERS IN PRODUCTION ENVIRONMENT.BECAUSE IT CAN CAUSE SECURITY ISSUES IN YOUR APPLICATION. SO IN PRODUCTION ENVIRONMENT YOU SHOULD SPECIFY THE ORIGINS,METHODS,HEADERS THAT YOU WANT TO ALLOW IN YOUR APPLICATION.
@@ -105,7 +147,7 @@ var app = builder.Build();//app is requtest pipeline,it is created at runtime.
 // Register the middlewares in  HTTP request pipeline.
 */
 //custom middlewares we need to register in the program.cs file of the web api project using the UseMiddleware method   app object. The UseMiddleware method is used to add custom middleware components to the application's request processing pipeline. By adding the GlobalErrorHandlerMiddleware, you ensure that any unhandled exceptions that occur during the processing of HTTP requests will be caught and handled by this middleware, allowing you to return a standardized error response to the client and log the error details as needed.
-app.UseMiddleware<GlobalErrorHandlerMiddleware>();//Registering the  Custom Middleware to appliction pipeline like this way.
+app.UseMiddleware<GlobalExceptionMiddleware>();//Registering the  Custom Middleware to appliction pipeline like this way.
 app.UseMiddleware<RequestLoggingMiddleware>();//Registering the  Custom Middleware to appliction pipeline like this way.
 //This line of code is used to add the GlobalErrorHandlerMiddleware to the application's request processing pipeline. The UseMiddleware method is an extension method that allows you to add custom middleware components to the pipeline. By adding the GlobalErrorHandlerMiddleware, you ensure that any unhandled exceptions that occur during the processing of HTTP requests will be caught and handled by this middleware, allowing you to return a standardized error response to the client and log the error details as needed.
 // Configure the HTTP request pipeline.
@@ -117,7 +159,8 @@ if (app.Environment.IsDevelopment())
 //UseCors is a predefined middleware,created by the Microsoft team to handle the cross-origin resource sharing in the api level.
 app.UseCors();//add the cors middleware to the application pipeline and specify the policy name that we defined in the AddCors method of the builder object in the dependency injection container section.
 //app.UseCors("bankPolicy");//this cors is for specific policy,if you want to enable the cors for specific policy then you need to specify the policy name in the app.useCors() method like this way.
-app.UseAuthorization();//Predefined Middlewares,created by the Microsoft team to handle the authorization in the api.
+app.UseAuthentication();//This is predefined Middleware,created by the Microsoft team to handle the Authentication in the api.
+app.UseAuthorization();//this is Predefined Middlewares,created by the Microsoft team to handle the Authorization in the api.
 
 app.MapControllers();
 
@@ -175,15 +218,15 @@ and also  we can log that exception in azure cloud by using azure application in
 1.what is th diffrence between app.use() and app.run() and app.map() methods in the program.cs file of the web api project?
 A)=>app.use():
 ==============
-method is used to add the middleware to the application pipeline and it will call the next middleware in the pipeline by using next.invoke() method. 
+use method is used to add the middleware to the application pipeline and it will call the next middleware in the pipeline by using next.invoke() method. 
 if you are not calling next.invoke() method in the app.use() method, it will not call the next middleware in the pipeline and it will stop the execution of the middleware.
 B)=>app.run():
 =================
-method is a terminal middleware, it ends the application pipeline without calling the next middleware.
+run method is a terminal middleware, it ends the application pipeline without calling the next middleware.
 always app.run() is last in program.cs file.
 C)=>app.map():
 ===============
-method is used to branch the request pipeline based on the request path. 
+map method is used to branch the request pipeline based on the request path. 
 it allows you to define different middleware pipelines for different request paths.
 
 

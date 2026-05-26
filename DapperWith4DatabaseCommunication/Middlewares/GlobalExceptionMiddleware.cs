@@ -13,13 +13,13 @@ namespace DapperWith4DatabaseCommunication.Middlewares
 {
     //this is one custom middleware class for handling global errors in the application. The GlobalErrorHandlerMiddleware class is designed
     //to catch exceptions thrown during the request processing pipeline and return a standardized error response.
-    public class GlobalErrorHandlerMiddleware
+    public class GlobalExceptionMiddleware
     {
         //RequestDelegate is predefined delegate, that can process an HTTP request.
         private readonly RequestDelegate _next;
 
         private readonly ILoggingFactory _loggingFactory;
-
+        private readonly IHttpContextAccessor _httpContextAccessor;//Read the token by using this IHttpContextAccessor.
         // Middleware constructor takes the next RequestDelegate in the pipeline
         /*
          * Each middleware can:
@@ -28,10 +28,12 @@ namespace DapperWith4DatabaseCommunication.Middlewares
           Process the response after the next middleware completes.
          * 
          */
-        public GlobalErrorHandlerMiddleware(RequestDelegate next, ILoggingFactory loggingFactory)
+//Note:if you want to use any Interface methods into any other class,you must inject/pass the interface to constructor of that class.like below.
+        public GlobalExceptionMiddleware(RequestDelegate next, ILoggingFactory loggingFactory, IHttpContextAccessor httpContextAccessor)
         {//inject the RequestDelegate into the constructor to allow the middleware to call the next middleware in the pipeline.
             _next = next;
             _loggingFactory = loggingFactory;
+            _httpContextAccessor= httpContextAccessor;
         }
         public async Task InvokeAsync(HttpContext context)
         {
@@ -46,7 +48,9 @@ namespace DapperWith4DatabaseCommunication.Middlewares
             }
             catch (Exception error)
             {
-                await _loggingFactory.AddLoggingMessages("chandu", "Information", "GlobalErrorHandlerMiddleware: Excution Starts");//logg the message in database using custom logging factory
+                //here read the username from token and this username used for logging purpose.
+                var userName = _httpContextAccessor.HttpContext?.User?.FindFirst("UserName")?.Value ?? "Unknown";
+                await _loggingFactory.AddLoggingMessages(userName, "Information", "GlobalErrorHandlerMiddleware: Excution Starts");//logg the message in database using custom logging factory
                 var response = context.Response;//here we are getting the response object from the http context to set the status code and content type for the error response.
                 response.ContentType = "application/json";
                 switch (error)
@@ -74,9 +78,9 @@ namespace DapperWith4DatabaseCommunication.Middlewares
                     InnerExceptionError = error?.InnerException?.ToString()
                 });
                 //here log the messages in the text file by using serilog.
-                Log.Error("Custom Failure: {@StatusCode}, {@ErrorMessage}, {@StackTraceError},{@InnerExceptionError}",
-                response.StatusCode.ToString(), Convert.ToString(error?.Message), Convert.ToString(error?.StackTrace), Convert.ToString(error?.InnerException));
-                await _loggingFactory.AddLoggingMessages("chandu", "Error", $"Custom Failure: StatusCode:{response.StatusCode}, ErrorMessage:{Convert.ToString(error?.Message)}, StackTraceError:{Convert.ToString(error?.StackTrace)}, InnerExceptionError:{Convert.ToString(error?.InnerException)}");
+                Log.Error("GlobalErrorHandlerMiddleware:Custom Failure: {@StatusCode}, {@ErrorMessage}, {@StackTraceError},{@InnerExceptionError},LoggedinCurrnetUsername is:{@Username}",
+                response.StatusCode.ToString(), Convert.ToString(error?.Message), Convert.ToString(error?.StackTrace), Convert.ToString(error?.InnerException),userName);
+                await _loggingFactory.AddLoggingMessages(userName, "Error", $"Custom Failure: StatusCode:{response.StatusCode}, ErrorMessage:{Convert.ToString(error?.Message)}, StackTraceError:{Convert.ToString(error?.StackTrace)}, InnerExceptionError:{Convert.ToString(error?.InnerException)}");
                 //here log the message in our project text file by using serilog.
                 //in sqlserver database also we are logging the exceptions.
                 //in Azure application insights Service we are logging the exceptions
@@ -84,12 +88,12 @@ namespace DapperWith4DatabaseCommunication.Middlewares
                 //in  network log also some of the companies log the error messages.
                 //here log the messages in sql server database.
 
-                await _loggingFactory.AddProjectLevelErrorlogAsync(response.StatusCode.ToString(), Convert.ToString(error?.Message), Convert.ToString(error?.StackTrace), Convert.ToString(error?.InnerException));
+                await _loggingFactory.AddProjectLevelErrorlogAsync(response.StatusCode.ToString(), Convert.ToString(error?.Message), Convert.ToString(error?.StackTrace), Convert.ToString(error?.InnerException), userName);
 
                 //.......Write The logic In Future Based on Your Cloud Usage requirment.
                 //If you use Azure cloud,Add the Azure Application Insights Logic Here.To Log The Exceptions in Azure cloud.
                 //If You use Aws cloud Add the Aws CloudWatchLogic Here.To Log The exceptions In Aws cloud.
-                await _loggingFactory.AddLoggingMessages("chandu", "Information", "GlobalErrorHandlerMiddleware: Excution Ends");//logg the message in database using custom logging factory
+                await _loggingFactory.AddLoggingMessages(userName, "Information", "GlobalErrorHandlerMiddleware: Excution Ends");//logg the message in database using custom logging factory
                 var errorFriendlyMessage = new ProblemDetails
                 {//we can't return orginal error to api response,we need to return userfriendly error message like below.
                     Type = "API Exception",
